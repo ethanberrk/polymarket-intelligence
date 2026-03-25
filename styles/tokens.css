@@ -5,7 +5,7 @@
 /* --- Base Tokens (scale, spacing, typography, radius, transitions, layout) --- */
 :root {
   --font-body: 'Inter', 'Helvetica Neue', sans-serif;
-  --font-display: 'Instrument Serif', Georgia, serif;
+  --font-display: 'Playfair Display', Georgia, serif;
 
   --text-xs:   clamp(0.75rem,  0.7rem  + 0.25vw, 0.875rem);
   --text-sm:   clamp(0.875rem, 0.8rem  + 0.35vw, 1rem);
@@ -44,6 +44,12 @@
 
 /* --- Light Mode (Default) --- */
 :root, [data-theme="light"] {
+  /* Brand */
+  --color-header-bg:      #0D0D0D;
+  --color-header-text:    #f5f4f0;
+  --color-brand-red:      #C41E3A;
+  --color-brand-red-muted: rgba(196,30,58,0.08);
+
   --color-bg:             #f5f4f0;
   --color-surface:        #ffffff;
   --color-surface-2:      #fafaf8;
@@ -59,7 +65,7 @@
   --color-primary:        #1a3a5c;
   --color-primary-hover:  #0f2944;
 
-  --color-red:            #c0392b;
+  --color-red:            #C41E3A;
   --color-red-bg:         #fdf2f2;
   --color-red-light:      #e74c3c;
   --color-blue:           #2980b9;

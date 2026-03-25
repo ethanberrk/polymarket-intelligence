@@ -13,24 +13,27 @@ function formatVolume(v: number): string {
 export function Hero({ data }: HeroProps) {
   return (
     <section className="hero">
-      <div className="hero-label">Prediction Market Intelligence</div>
-      <h1>By The Odds</h1>
+      <div className="hero-edition">
+        <span className="hero-edition-dot" />
+        <span className="hero-edition-text">Live Markets</span>
+      </div>
+      <h1>What the odds say.</h1>
       <p className="hero-subtitle">
-        What prediction markets are pricing in across politics, economics, and world events —
-        aggregated from {data.totalMarkets} active contracts across the largest prediction markets.
+        Aggregated from the largest prediction markets — updated every 10 minutes.
+        No opinion, no spin. Just the numbers.
       </p>
       <div className="hero-stats">
         <div className="hero-stat">
-          <div className="hero-stat-value">{data.totalMarkets}</div>
-          <div className="hero-stat-label">Active Markets</div>
+          <span className="hero-stat-value">{data.totalMarkets}</span>
+          <span className="hero-stat-label">Active Markets</span>
         </div>
         <div className="hero-stat">
-          <div className="hero-stat-value">{formatVolume(data.totalVolume)}</div>
-          <div className="hero-stat-label">Total Volume</div>
+          <span className="hero-stat-value">{formatVolume(data.totalVolume)}</span>
+          <span className="hero-stat-label">Total Volume</span>
         </div>
         <div className="hero-stat">
-          <div className="hero-stat-value">{data.sections.filter(s => s.markets.length > 0).length}</div>
-          <div className="hero-stat-label">Categories</div>
+          <span className="hero-stat-value">{data.sections.filter(s => s.markets.length > 0).length}</span>
+          <span className="hero-stat-label">Categories</span>
         </div>
       </div>
     </section>

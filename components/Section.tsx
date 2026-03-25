@@ -22,6 +22,9 @@ export function Section({ section }: SectionProps) {
   return (
     <section className="section" id={section.id}>
       <div className="section-header">
+        <div className="section-category-label">
+          <span className="section-category-text">{section.id.toUpperCase()}</span>
+        </div>
         <h2 className="section-title">{section.label}</h2>
         {section.intro && <p className="section-intro">{section.intro}</p>}
       </div>
