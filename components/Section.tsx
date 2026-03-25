@@ -34,7 +34,7 @@ export function Section({ section }: SectionProps) {
         <Spotlight market={spotlightMarket} description={section.spotlightDescription} />
       )}
 
-      <MarketGrid markets={section.markets} />
+      <MarketGrid markets={section.markets.filter(m => m.slug !== section.spotlightSlug)} />
     </section>
   )
 }

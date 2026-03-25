@@ -10,9 +10,10 @@ export function normalizeOutcomes(market: RawMarket): Outcome[] {
   } catch {
     return []
   }
+  if (labels.length !== rawPrices.length || labels.length === 0) return []
   const prices = rawPrices.map(p => { const n = parseFloat(p); return isNaN(n) ? 0 : n })
   const total = prices.reduce((sum, p) => sum + p, 0)
-  if (total === 0 || labels.length === 0) return []
+  if (total === 0) return []
   return labels.map((label, i) => ({ label, probability: prices[i] / total }))
 }
 

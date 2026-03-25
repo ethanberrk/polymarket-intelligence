@@ -7,17 +7,24 @@ export function polymarketUrl(slug: string): string {
   return `https://polymarket.com/event/${slug}`
 }
 
+const FETCH_BATCH_SIZE = 10
+
 export async function fetchMarketsBySlug(slugs: string[]): Promise<RawMarket[]> {
   if (slugs.length === 0) return []
-  const results = await Promise.all(
-    slugs.map(async slug => {
-      const res = await fetch(`https://gamma-api.polymarket.com/markets?slug=${slug}`)
-      if (!res.ok) throw new Error(`Gamma API error for slug ${slug}: ${res.status}`)
-      const data = await res.json()
-      return Array.isArray(data) ? data : []
-    })
-  )
-  return results.flat()
+  const all: RawMarket[] = []
+  for (let i = 0; i < slugs.length; i += FETCH_BATCH_SIZE) {
+    const batch = slugs.slice(i, i + FETCH_BATCH_SIZE)
+    const batchResults = await Promise.all(
+      batch.map(async slug => {
+        const res = await fetch(`https://gamma-api.polymarket.com/markets?slug=${slug}`)
+        if (!res.ok) throw new Error(`Gamma API error for slug ${slug}: ${res.status}`)
+        const data = await res.json()
+        return Array.isArray(data) ? data : []
+      })
+    )
+    all.push(...batchResults.flat())
+  }
+  return all
 }
 
 export async function fetchTrendingMarkets(): Promise<RawMarket[]> {

@@ -11,8 +11,8 @@ export function SiteHeader({ fetchedAt }: SiteHeaderProps) {
   const [theme, setTheme] = useState<'light' | 'dark'>('light')
 
   useEffect(() => {
-    const stored = localStorage.getItem('theme') as 'light' | 'dark' | null
-    if (stored) setTheme(stored)
+    const actual = document.documentElement.dataset.theme as 'light' | 'dark' | undefined
+    setTheme(actual === 'dark' ? 'dark' : 'light')
   }, [])
 
   function toggleTheme() {
