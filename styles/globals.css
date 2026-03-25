@@ -23,7 +23,8 @@ html {
   text-rendering: optimizeLegibility;
   scroll-behavior: smooth;
   hanging-punctuation: first last;
-  scroll-padding-top: var(--space-16);
+  /* account for sticky header + category nav */
+  scroll-padding-top: calc(var(--header-height) + 48px + var(--space-6));
 }
 
 body {
@@ -91,6 +92,53 @@ a, button, [role="button"], [role="link"], input, textarea, select {
   .page-wrapper {
     padding: 0 var(--space-4);
   }
+}
+
+/* --- Edition Bar --- */
+.edition-bar {
+  background: var(--color-bg);
+  border-bottom: 1px solid var(--color-divider);
+  height: var(--edition-bar-height);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--space-6);
+  max-width: 100%;
+  gap: var(--space-4);
+}
+
+.edition-bar-tagline {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+}
+
+.edition-bar-date {
+  font-size: 11px;
+  color: var(--color-text-muted);
+  white-space: nowrap;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.edition-bar-stats {
+  font-size: 11px;
+  color: var(--color-text-faint);
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (max-width: 768px) {
+  .edition-bar-date { display: none; }
+  .edition-bar { justify-content: space-between; }
+}
+
+@media (max-width: 480px) {
+  .edition-bar-stats { display: none; }
 }
 
 /* --- Header --- */
@@ -188,7 +236,49 @@ a, button, [role="button"], [role="link"], input, textarea, select {
   white-space: nowrap;
 }
 
-/* --- Hero --- */
+/* --- Section Preview (home "All" view) --- */
+.section-preview {
+  padding: clamp(var(--space-8), 4vw, var(--space-12)) 0;
+  border-bottom: 1px solid var(--color-divider);
+}
+
+.section-preview:last-child {
+  border-bottom: none;
+}
+
+.section-preview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: var(--space-6);
+  margin-bottom: var(--space-6);
+}
+
+.section-preview-meta {
+  flex: 1;
+  min-width: 0;
+}
+
+.see-all-btn {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--color-brand-red);
+  background: none;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+  padding: var(--space-1) 0;
+  letter-spacing: 0.02em;
+  flex-shrink: 0;
+  margin-top: var(--space-1);
+  transition: opacity var(--transition-interactive);
+}
+
+.see-all-btn:hover {
+  opacity: 0.7;
+}
+
+/* --- Hero (legacy, kept for reference) --- */
 .hero {
   padding: clamp(var(--space-10), 5vw, var(--space-16)) 0 clamp(var(--space-8), 4vw, var(--space-12));
   text-align: center;
@@ -795,40 +885,54 @@ a, button, [role="button"], [role="link"], input, textarea, select {
   border-bottom: none;
 }
 
-/* --- Nav Tabs --- */
-.section-nav {
+/* --- Category Nav (replaces section-nav) --- */
+.category-nav {
+  position: sticky;
+  top: var(--header-height);
+  z-index: 40;
+  background: var(--color-bg);
+  border-bottom: 1px solid var(--color-divider);
   display: flex;
   gap: 0;
-  flex-wrap: nowrap;
   overflow-x: auto;
-  margin-bottom: var(--space-8);
-  border-bottom: 2px solid var(--color-divider);
   -ms-overflow-style: none;
   scrollbar-width: none;
+  padding: 0 var(--space-6);
 }
 
-.section-nav::-webkit-scrollbar {
-  display: none;
+.category-nav::-webkit-scrollbar { display: none; }
+
+@media (max-width: 640px) {
+  .category-nav { padding: 0 var(--space-4); }
 }
 
-.section-nav a {
-  font-size: var(--text-xs);
+.category-tab {
+  font-size: 12px;
+  font-weight: 500;
   color: var(--color-text-muted);
-  text-decoration: none;
-  padding: var(--space-3) var(--space-4);
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-  font-weight: 600;
-  white-space: nowrap;
+  background: none;
+  border: none;
   border-bottom: 2px solid transparent;
-  margin-bottom: -2px;
+  margin-bottom: -1px;
+  padding: var(--space-3) var(--space-4);
+  cursor: pointer;
+  white-space: nowrap;
+  letter-spacing: 0.02em;
   transition: color var(--transition-interactive), border-color var(--transition-interactive);
 }
 
-.section-nav a:hover {
+.category-tab:hover {
+  color: var(--color-text);
+}
+
+.category-tab.active {
   color: var(--color-text);
   border-bottom-color: var(--color-brand-red);
+  font-weight: 600;
 }
+
+/* Keep legacy section-nav styles for any remaining uses */
+.section-nav { display: none; }
 
 /* --- Footer --- */
 .site-footer {

@@ -40,6 +40,9 @@
   --content-narrow: 640px;
   --content-default: 960px;
   --content-wide: 1200px;
+
+  --header-height: 62px;
+  --edition-bar-height: 36px;
 }
 
 /* --- Light Mode (Default) --- */

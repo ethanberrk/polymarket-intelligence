@@ -28,7 +28,6 @@ export function SiteHeader({ fetchedAt }: SiteHeaderProps) {
         <div className="header-left" />
         <div className="header-center">
           <a href="#" className="site-logo">By The Odds</a>
-          <div className="site-tagline">Prediction Market Intelligence</div>
         </div>
         <div className="header-right">
           <LastUpdated fetchedAt={fetchedAt} />
