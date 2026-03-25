@@ -13,11 +13,11 @@ function formatVolume(v: number): string {
 export function Hero({ data }: HeroProps) {
   return (
     <section className="hero">
-      <div className="hero-label">Polymarket Prediction Markets</div>
-      <h1>State of US Politics</h1>
+      <div className="hero-label">Prediction Market Intelligence</div>
+      <h1>By The Odds</h1>
       <p className="hero-subtitle">
-        What prediction markets are pricing in across elections, foreign policy, legislation,
-        and executive power — based on {data.totalMarkets} active Polymarket contracts.
+        What prediction markets are pricing in across politics, economics, and world events —
+        aggregated from {data.totalMarkets} active contracts across the largest prediction markets.
       </p>
       <div className="hero-stats">
         <div className="hero-stat">

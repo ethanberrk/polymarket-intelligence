@@ -2,8 +2,8 @@ import type { Metadata } from 'next'
 import '@/styles/globals.css'
 
 export const metadata: Metadata = {
-  title: 'State of US Politics — Polymarket Intelligence',
-  description: 'Live prediction market probabilities across US elections, foreign policy, legislation, and executive power.',
+  title: 'By The Odds',
+  description: 'Live prediction market probabilities across politics, economics, and world events — aggregated from the largest prediction markets.',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

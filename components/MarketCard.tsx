@@ -1,5 +1,4 @@
 import type { PolymarketMarket, Outcome } from '@/lib/types'
-import { polymarketUrl } from '@/lib/polymarket'
 
 const BAR_COLORS = ['blue', 'red', 'accent', 'neutral', 'neutral']
 
@@ -22,12 +21,7 @@ export function MarketCard({ market }: MarketCardProps) {
   const { displayed, otherProb } = prepareOutcomes(market.outcomes)
 
   return (
-    <a
-      href={polymarketUrl(market.slug)}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="market-card"
-    >
+    <div className="market-card">
       <div className="market-card-header">
         <div className="market-title">{market.question}</div>
         <div className="market-volume">
@@ -64,6 +58,6 @@ export function MarketCard({ market }: MarketCardProps) {
           </div>
         )}
       </div>
-    </a>
+    </div>
   )
 }
