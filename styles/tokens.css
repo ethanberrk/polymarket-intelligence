@@ -1,0 +1,147 @@
+/* ============================================
+   Design Tokens — CSS Custom Properties only
+   ============================================ */
+
+/* --- Base Tokens (scale, spacing, typography, radius, transitions, layout) --- */
+:root {
+  --font-body: 'Inter', 'Helvetica Neue', sans-serif;
+  --font-display: 'Instrument Serif', Georgia, serif;
+
+  --text-xs:   clamp(0.75rem,  0.7rem  + 0.25vw, 0.875rem);
+  --text-sm:   clamp(0.875rem, 0.8rem  + 0.35vw, 1rem);
+  --text-base: clamp(1rem,     0.95rem + 0.25vw, 1.125rem);
+  --text-lg:   clamp(1.125rem, 1rem    + 0.75vw, 1.5rem);
+  --text-xl:   clamp(1.5rem,   1.2rem  + 1.25vw, 2.25rem);
+  --text-2xl:  clamp(2rem,     1.2rem  + 2.5vw,  3.5rem);
+  --text-3xl:  clamp(2.5rem,   1rem    + 4vw,    5rem);
+
+  --space-1:  0.25rem;
+  --space-2:  0.5rem;
+  --space-3:  0.75rem;
+  --space-4:  1rem;
+  --space-5:  1.25rem;
+  --space-6:  1.5rem;
+  --space-8:  2rem;
+  --space-10: 2.5rem;
+  --space-12: 3rem;
+  --space-16: 4rem;
+  --space-20: 5rem;
+  --space-24: 6rem;
+  --space-32: 8rem;
+
+  --radius-sm: 0.375rem;
+  --radius-md: 0.5rem;
+  --radius-lg: 0.75rem;
+  --radius-xl: 1rem;
+  --radius-full: 9999px;
+
+  --transition-interactive: 180ms cubic-bezier(0.16, 1, 0.3, 1);
+
+  --content-narrow: 640px;
+  --content-default: 960px;
+  --content-wide: 1200px;
+}
+
+/* --- Light Mode (Default) --- */
+:root, [data-theme="light"] {
+  --color-bg:             #f5f4f0;
+  --color-surface:        #ffffff;
+  --color-surface-2:      #fafaf8;
+  --color-surface-offset: #eeedea;
+  --color-divider:        #ddd;
+  --color-border:         #d4d1ca;
+
+  --color-text:           #1a1a1a;
+  --color-text-muted:     #6b6b6b;
+  --color-text-faint:     #aaa;
+  --color-text-inverse:   #f9f8f4;
+
+  --color-primary:        #1a3a5c;
+  --color-primary-hover:  #0f2944;
+
+  --color-red:            #c0392b;
+  --color-red-bg:         #fdf2f2;
+  --color-red-light:      #e74c3c;
+  --color-blue:           #2980b9;
+  --color-blue-bg:        #ebf5fb;
+  --color-blue-light:     #3498db;
+
+  --color-accent:         #d4a03c;
+  --color-accent-bg:      #fef9f0;
+
+  --color-success:        #27ae60;
+  --color-warning:        #f39c12;
+  --color-danger:         #e74c3c;
+
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+  --shadow-lg: 0 12px 32px rgba(0,0,0,0.1);
+}
+
+/* --- Dark Mode --- */
+[data-theme="dark"] {
+  --color-bg:             #111111;
+  --color-surface:        #1a1a1a;
+  --color-surface-2:      #222222;
+  --color-surface-offset: #1e1e1e;
+  --color-divider:        #333;
+  --color-border:         #444;
+
+  --color-text:           #e0e0e0;
+  --color-text-muted:     #999;
+  --color-text-faint:     #666;
+  --color-text-inverse:   #1a1a1a;
+
+  --color-primary:        #5b9bd5;
+  --color-primary-hover:  #4a8bc5;
+
+  --color-red:            #e74c3c;
+  --color-red-bg:         #2a1515;
+  --color-red-light:      #ff6b6b;
+  --color-blue:           #5dade2;
+  --color-blue-bg:        #152535;
+  --color-blue-light:     #7ec8e3;
+
+  --color-accent:         #f0c75e;
+  --color-accent-bg:      #2a2415;
+
+  --color-success:        #2ecc71;
+  --color-warning:        #f1c40f;
+  --color-danger:         #ff6b6b;
+
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
+  --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
+  --shadow-lg: 0 12px 32px rgba(0,0,0,0.5);
+}
+
+/* --- System Dark Mode (no explicit data-theme attribute) --- */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) {
+    --color-bg:             #111111;
+    --color-surface:        #1a1a1a;
+    --color-surface-2:      #222222;
+    --color-surface-offset: #1e1e1e;
+    --color-divider:        #333;
+    --color-border:         #444;
+    --color-text:           #e0e0e0;
+    --color-text-muted:     #999;
+    --color-text-faint:     #666;
+    --color-text-inverse:   #1a1a1a;
+    --color-primary:        #5b9bd5;
+    --color-primary-hover:  #4a8bc5;
+    --color-red:            #e74c3c;
+    --color-red-bg:         #2a1515;
+    --color-red-light:      #ff6b6b;
+    --color-blue:           #5dade2;
+    --color-blue-bg:        #152535;
+    --color-blue-light:     #7ec8e3;
+    --color-accent:         #f0c75e;
+    --color-accent-bg:      #2a2415;
+    --color-success:        #2ecc71;
+    --color-warning:        #f1c40f;
+    --color-danger:         #ff6b6b;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.3);
+    --shadow-md: 0 4px 12px rgba(0,0,0,0.4);
+    --shadow-lg: 0 12px 32px rgba(0,0,0,0.5);
+  }
+}
