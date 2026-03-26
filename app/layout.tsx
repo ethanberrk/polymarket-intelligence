@@ -8,15 +8,8 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" data-theme="dark">
       <head>
-        {/* Anti-FOCT: reads localStorage before paint to prevent flash of wrong theme */}
-        <script
-          dangerouslySetInnerHTML={{
-            __html: `try{var t=localStorage.getItem('theme');if(t)document.documentElement.dataset.theme=t}catch(e){}`
-          }}
-        />
-      </head>
       <body>{children}</body>
     </html>
   )
