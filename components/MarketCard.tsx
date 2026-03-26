@@ -2,6 +2,13 @@ import type { PolymarketMarket, Outcome } from '@/lib/types'
 
 const BAR_COLORS = ['blue', 'red', 'accent', 'neutral', 'neutral']
 
+function formatVolume(volume: number): string {
+  if (volume >= 1_000_000) return `$${(volume / 1_000_000).toFixed(1)}M`
+  if (volume >= 1_000) return `$${Math.round(volume / 1_000)}K`
+  if (volume > 0) return '< $1K'
+  return '$0'
+}
+
 function prepareOutcomes(outcomes: Outcome[]): { displayed: (Outcome & { colorClass: string })[]; otherProb: number } {
   const sorted = [...outcomes].sort((a, b) => b.probability - a.probability)
   const top = sorted.filter(o => o.probability >= 0.01).slice(0, 4)
@@ -24,11 +31,7 @@ export function MarketCard({ market }: MarketCardProps) {
     <div className="market-card">
       <div className="market-card-header">
         <div className="market-title">{market.question}</div>
-        <div className="market-volume">
-          {market.volume >= 1_000_000
-            ? `$${(market.volume / 1_000_000).toFixed(1)}M`
-            : `$${Math.round(market.volume / 1_000)}K`}
-        </div>
+        <div className="market-volume">{formatVolume(market.volume)}</div>
       </div>
       <div className="market-outcomes">
         {displayed.map(outcome => (

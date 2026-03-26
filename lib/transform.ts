@@ -64,6 +64,11 @@ export async function buildPageData(
 
     const trending = trendingRaw
       .map(m => transformMarket(m, 'trending'))
+      .filter(m => {
+        if (m.outcomes.length === 0) return false
+        const maxProb = Math.max(...m.outcomes.map(o => o.probability))
+        return maxProb < 0.99
+      })
       .sort((a, b) => b.volume24h - a.volume24h)
       .slice(0, 10)
 

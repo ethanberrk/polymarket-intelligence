@@ -15,9 +15,11 @@ export function KPIRow({ markets }: KPIRowProps) {
           ? market.outcomes.find(o => o.label.toLowerCase() === 'yes')
           : [...market.outcomes].sort((a, b) => b.probability - a.probability)[0]
         const pct = displayOutcome ? Math.round(displayOutcome.probability * 100) : 0
+        const outcomeLabel = displayOutcome?.label ?? 'Yes'
         return (
           <div key={market.id} className="kpi-card">
             <div className="kpi-value">{pct}%</div>
+            <div className="kpi-outcome">{outcomeLabel}</div>
             <div className="kpi-label">{market.question}</div>
           </div>
         )

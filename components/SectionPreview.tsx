@@ -4,17 +4,18 @@ import { MarketCard } from './MarketCard'
 interface SectionPreviewProps {
   section: CuratedSection
   onSeeAll: () => void
+  isLead?: boolean
 }
 
-export function SectionPreview({ section, onSeeAll }: SectionPreviewProps) {
+export function SectionPreview({ section, onSeeAll, isLead }: SectionPreviewProps) {
   const previewMarkets = section.markets
     .filter(m => m.slug !== section.spotlightSlug)
-    .slice(0, 3)
+    .slice(0, isLead ? 4 : 3)
 
   if (previewMarkets.length === 0) return null
 
   return (
-    <div className="section-preview" id={section.id}>
+    <div className={`section-preview${isLead ? ' section-preview--lead' : ''}`} id={section.id}>
       <div className="section-preview-header">
         <div className="section-preview-meta">
           <div className="section-category-label">
@@ -27,11 +28,6 @@ export function SectionPreview({ section, onSeeAll }: SectionPreviewProps) {
           All {section.markets.length} markets →
         </button>
       </div>
-      {section.narrative && (
-        <div className="callout">
-          <div className="callout-text">{section.narrative}</div>
-        </div>
-      )}
       <div className="market-grid">
         {previewMarkets.map(market => (
           <MarketCard key={market.id} market={market} />

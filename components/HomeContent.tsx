@@ -49,11 +49,12 @@ export function HomeContent({ sections, trending }: HomeContentProps) {
         <div className="home-layout page-wrapper">
           <WhatMarketsSay sections={sections} onSectionClick={setActive} />
           <div className="home-main">
-            {activeSections.map(s => (
+            {activeSections.map((s, i) => (
               <SectionPreview
                 key={s.id}
                 section={s}
                 onSeeAll={() => setActive(s.id)}
+                isLead={i === 0}
               />
             ))}
           </div>

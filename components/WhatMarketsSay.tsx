@@ -36,6 +36,7 @@ export function WhatMarketsSay({ sections, onSectionClick }: WhatMarketsSayProps
                 <span className="wtms-pct">{insight!.signal.pct}%</span>
                 <span className="wtms-signal-label">{insight!.signal.label}</span>
               </div>
+              <p className="wtms-question">{insight!.question}</p>
               <p className="wtms-narrative">{insight!.narrative}</p>
             </div>
           </li>

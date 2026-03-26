@@ -41,6 +41,7 @@ export function firstSentence(text: string): string {
  */
 export function getSectionInsight(section: CuratedSection): {
   signal: { pct: number; label: string }
+  question: string
   narrative: string
 } | null {
   const market = section.spotlightSlug
@@ -53,5 +54,5 @@ export function getSectionInsight(section: CuratedSection): {
   if (!signal) return null
 
   const narrative = firstSentence(section.narrative || section.intro || market.question)
-  return { signal, narrative }
+  return { signal, question: market.question, narrative }
 }
