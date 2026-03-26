@@ -1078,6 +1078,7 @@ a, button, [role="button"], [role="link"], input, textarea, select {
   background: var(--color-bg);
   border-bottom: 1px solid var(--color-divider);
   display: flex;
+  justify-content: center;
   gap: 0;
   overflow-x: auto;
   -ms-overflow-style: none;
