@@ -5,6 +5,7 @@ import type { CuratedSection, PolymarketMarket } from '@/lib/types'
 import { Section } from './Section'
 import { TrendingSection } from './TrendingSection'
 import { SectionPreview } from './SectionPreview'
+import { WhatMarketsSay } from './WhatMarketsSay'
 
 interface HomeContentProps {
   sections: CuratedSection[]
@@ -16,12 +17,13 @@ export function HomeContent({ sections, trending }: HomeContentProps) {
 
   const activeSections = sections.filter(s => s.markets.length > 0)
   const selectedSection = activeSections.find(s => s.id === active)
+  const isHome = active === 'all'
 
   return (
     <>
       <nav className="category-nav" aria-label="Category filter">
         <button
-          className={`category-tab${active === 'all' ? ' active' : ''}`}
+          className={`category-tab${isHome ? ' active' : ''}`}
           onClick={() => setActive('all')}
         >
           Home
@@ -43,9 +45,10 @@ export function HomeContent({ sections, trending }: HomeContentProps) {
         </button>
       </nav>
 
-      <div className="page-wrapper">
-        {active === 'all' && (
-          <>
+      {isHome ? (
+        <div className="home-layout page-wrapper">
+          <WhatMarketsSay sections={sections} onSectionClick={setActive} />
+          <div className="home-main">
             {activeSections.map(s => (
               <SectionPreview
                 key={s.id}
@@ -53,17 +56,14 @@ export function HomeContent({ sections, trending }: HomeContentProps) {
                 onSeeAll={() => setActive(s.id)}
               />
             ))}
-          </>
-        )}
-
-        {selectedSection && (
-          <Section section={selectedSection} />
-        )}
-
-        {active === 'trending' && (
-          <TrendingSection markets={trending} />
-        )}
-      </div>
+          </div>
+        </div>
+      ) : (
+        <div className="page-wrapper">
+          {selectedSection && <Section section={selectedSection} />}
+          {active === 'trending' && <TrendingSection markets={trending} />}
+        </div>
+      )}
     </>
   )
 }
