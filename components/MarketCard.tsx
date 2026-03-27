@@ -1,4 +1,5 @@
 import type { PolymarketMarket, Outcome } from '@/lib/types'
+import { polymarketUrl } from '@/config/site'
 
 const BAR_COLORS = ['blue', 'red', 'accent', 'neutral', 'neutral']
 
@@ -61,6 +62,14 @@ export function MarketCard({ market }: MarketCardProps) {
           </div>
         )}
       </div>
+      <a
+        href={polymarketUrl(market.slug)}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="market-trade-btn"
+      >
+        Trade on Polymarket →
+      </a>
     </div>
   )
 }

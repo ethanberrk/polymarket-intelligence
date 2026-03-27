@@ -9,7 +9,14 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" data-theme="dark">
-      <body>{children}</body>
+      <body>
+        {children}
+        <footer className="site-footer">
+          <p className="site-footer-disclosure">
+            Links to Polymarket may include a referral code. Data is for informational purposes only and does not constitute financial advice.
+          </p>
+        </footer>
+      </body>
     </html>
   )
 }
