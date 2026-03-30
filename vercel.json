@@ -1,1 +1,8 @@
-{}
+{
+  "crons": [
+    {
+      "path": "/api/refresh-sections",
+      "schedule": "0 5 * * *"
+    }
+  ]
+}
