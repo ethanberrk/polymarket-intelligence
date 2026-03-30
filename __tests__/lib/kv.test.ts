@@ -1,10 +1,12 @@
 import type { CuratedSection } from '@/lib/types'
 
-jest.mock('@vercel/kv')
+jest.mock('@vercel/kv', () => ({
+  kv: { get: jest.fn(), set: jest.fn() },
+}))
 
-import { kv } from '@vercel/kv'
 import { getSections, setSections } from '@/lib/kv'
 
+const { kv } = jest.requireMock('@vercel/kv') as { kv: { get: jest.Mock; set: jest.Mock } }
 const mockGet = kv.get
 const mockSet = kv.set
 
