@@ -49,3 +49,9 @@ export interface PageData {
   totalMarkets: number
   totalVolume: number
 }
+
+export interface Headline {
+  title: string
+  source: string
+  publishedAt: string  // ISO string or RSS pubDate string
+}
