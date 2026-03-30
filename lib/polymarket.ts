@@ -38,3 +38,38 @@ export async function fetchTrendingMarkets(): Promise<RawMarket[]> {
   }
   return Array.isArray(data) ? data : []
 }
+
+export async function fetchAllMarkets(): Promise<RawMarket[]> {
+  const res = await fetch(
+    'https://gamma-api.polymarket.com/markets?active=true&limit=500'
+  )
+  if (!res.ok) throw new Error(`Gamma API fetchAllMarkets failed: ${res.status}`)
+  const data = await res.json()
+  return Array.isArray(data) ? data : []
+}
+
+export function filterAndCapMarkets(
+  markets: RawMarket[],
+  minVolume24h = 5000,
+  capPerCategory = 20
+): RawMarket[] {
+  const liquid = markets.filter(
+    m => m.active && !m.closed && parseFloat(m.volume24hr) >= minVolume24h
+  )
+
+  const byCategory = new Map<string, RawMarket[]>()
+  for (const market of liquid) {
+    const cat = market.tags[0]?.label ?? 'Other'
+    if (!byCategory.has(cat)) byCategory.set(cat, [])
+    byCategory.get(cat)!.push(market)
+  }
+
+  const result: RawMarket[] = []
+  for (const catMarkets of byCategory.values()) {
+    const top = [...catMarkets]
+      .sort((a, b) => parseFloat(b.volume24hr) - parseFloat(a.volume24hr))
+      .slice(0, capPerCategory)
+    result.push(...top)
+  }
+  return result
+}
