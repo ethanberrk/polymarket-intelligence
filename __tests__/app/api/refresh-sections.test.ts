@@ -39,6 +39,7 @@ function makeRequest(secret?: string): Request {
 }
 
 beforeEach(() => {
+  jest.clearAllMocks()
   process.env.CRON_SECRET = 'test-secret'
   ;(fetchAllMarkets as jest.Mock).mockResolvedValue([])
   ;(filterAndCapMarkets as jest.Mock).mockReturnValue([])
