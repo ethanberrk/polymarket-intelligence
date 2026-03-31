@@ -1,108 +1,111 @@
-import Anthropic from '@anthropic-ai/sdk'
 import type { RawMarket, Headline, CuratedSection } from './types'
 
-function buildPrompt(marketsJson: string, headlinesJson: string): string {
-  return `You are an editorial AI for "By the Odds", a news site that replaces traditional opinion journalism with prediction market probabilities.
+const CATEGORY_MAP: Record<string, string> = {
+  Politics: 'Politics',
+  'US Politics': 'Politics',
+  'World Politics': 'Politics',
+  Economy: 'Economy',
+  Economics: 'Economy',
+  Finance: 'Economy',
+  Business: 'Economy',
+  World: 'World',
+  'World Events': 'World',
+  International: 'World',
+  Sports: 'Sports',
+  Soccer: 'Sports',
+  Football: 'Sports',
+  Basketball: 'Sports',
+  Baseball: 'Sports',
+  Tennis: 'Sports',
+  'Combat Sports': 'Sports',
+  Golf: 'Sports',
+  Racing: 'Sports',
+  Crypto: 'Crypto',
+  Cryptocurrency: 'Crypto',
+  Bitcoin: 'Crypto',
+  Ethereum: 'Crypto',
+  DeFi: 'Crypto',
+  Entertainment: 'Entertainment',
+  'Pop Culture': 'Entertainment',
+  Movies: 'Entertainment',
+  Music: 'Entertainment',
+  Television: 'Entertainment',
+  Awards: 'Entertainment',
+}
 
-Given the following active Polymarket markets and recent news headlines, organize the markets into story clusters for the site's homepage.
+const CATEGORY_ORDER = ['Politics', 'Economy', 'World', 'Sports', 'Crypto', 'Entertainment']
 
-CATEGORIES (use exactly these, case-sensitive):
-Politics | Economy | World | Sports | Crypto | Entertainment
+function toId(label: string): string {
+  return label.toLowerCase().replace(/\s+/g, '-')
+}
 
-MARKETS (JSON, sorted by 24h volume descending):
-${marketsJson}
-
-RECENT HEADLINES (JSON):
-${headlinesJson}
-
-INSTRUCTIONS:
-- Group markets into story clusters based on shared topic
-- Assign each cluster to exactly one of the six categories above
-- Create 1-3 clusters per category (only include categories that have qualifying markets)
-- Each cluster must contain 3-12 markets
-- If a market has volume24h > 50000 but no strong news match, include it in the most relevant category anyway
-- The "narrative" field must describe what the market PROBABILITIES are actually saying — not just the news angle. Lead with a number where possible (e.g. "Markets put 63% odds on...").
-- The "intro" is 1-2 editorial sentences summarizing the story cluster
-- Output ONLY valid JSON — no prose, no markdown fences, no explanation before or after
-
-OUTPUT FORMAT (JSON array, each element matching this shape exactly):
-[
-  {
-    "id": "kebab-case-id",
-    "label": "Section Title",
-    "intro": "1-2 sentence editorial summary.",
-    "narrative": "What the market odds are actually saying.",
-    "slugs": ["slug-1", "slug-2", "slug-3"],
-    "spotlightSlug": "most-important-slug",
-    "spotlightDescription": "1 sentence about why this market matters."
+function topProbability(market: RawMarket): { outcome: string; probability: number } | null {
+  try {
+    const outcomes: string[] = JSON.parse(market.outcomes)
+    const prices: string[] = JSON.parse(market.outcomePrices)
+    let best = -1
+    let bestIdx = 0
+    for (let i = 0; i < prices.length; i++) {
+      const p = parseFloat(prices[i])
+      if (p > best) { best = p; bestIdx = i }
+    }
+    return { outcome: outcomes[bestIdx], probability: best }
+  } catch {
+    return null
   }
-]`
 }
 
-const OUTPUT_TOOL = {
-  name: 'output_sections',
-  description: 'Output the curated story sections as structured data',
-  input_schema: {
-    type: 'object' as const,
-    properties: {
-      sections: {
-        type: 'array',
-        items: {
-          type: 'object',
-          properties: {
-            id: { type: 'string' },
-            label: { type: 'string' },
-            intro: { type: 'string' },
-            narrative: { type: 'string' },
-            slugs: { type: 'array', items: { type: 'string' } },
-            spotlightSlug: { type: 'string' },
-            spotlightDescription: { type: 'string' },
-          },
-          required: ['id', 'label', 'intro', 'narrative', 'slugs', 'spotlightSlug', 'spotlightDescription'],
-        },
-      },
-    },
-    required: ['sections'],
-  },
+function buildNarrative(market: RawMarket): string {
+  const prob = topProbability(market)
+  if (!prob) return market.question
+  const pct = Math.round(prob.probability * 100)
+  if (prob.outcome === 'Yes') {
+    return `Markets put ${pct}% odds on: ${market.question}`
+  }
+  return `Markets put ${pct}% on "${prob.outcome}" for: ${market.question}`
 }
 
-export async function clusterMarkets(
+export function clusterMarkets(
   markets: RawMarket[],
-  headlines: Headline[]
-): Promise<Omit<CuratedSection, 'markets'>[]> {
-  const marketsJson = JSON.stringify(
-    markets.map(m => ({
-      slug: m.slug,
-      question: m.question,
-      volume24h: parseFloat(m.volume24hr),
-      tags: m.tags.map(t => t.label),
-    }))
-  )
+  _headlines: Headline[]
+): Omit<CuratedSection, 'markets'>[] {
+  const grouped = new Map<string, RawMarket[]>()
 
-  const headlinesJson = JSON.stringify(
-    headlines.slice(0, 50).map(h => ({
-      title: h.title,
-      source: h.source,
-      publishedAt: h.publishedAt,
-    }))
-  )
-
-  const client = new Anthropic()
-  const response = await client.messages.create({
-    model: 'claude-haiku-4-5-20251001',
-    max_tokens: 4096,
-    tools: [OUTPUT_TOOL],
-    tool_choice: { type: 'tool', name: 'output_sections' },
-    messages: [{ role: 'user', content: buildPrompt(marketsJson, headlinesJson) }],
-  })
-
-  const toolUse = response.content.find(c => c.type === 'tool_use')
-  if (!toolUse || toolUse.type !== 'tool_use') {
-    throw new Error('Claude did not return tool use block')
+  for (const market of markets) {
+    const rawTag = market.tags[0]?.label ?? ''
+    const category = CATEGORY_MAP[rawTag] ?? null
+    if (!category) continue
+    if (!grouped.has(category)) grouped.set(category, [])
+    grouped.get(category)!.push(market)
   }
-  const { sections } = toolUse.input as { sections: Omit<CuratedSection, 'markets'>[] }
-  if (!Array.isArray(sections) || sections.length === 0) {
-    throw new Error('Claude returned empty sections')
+
+  const sections: Omit<CuratedSection, 'markets'>[] = []
+
+  for (const category of CATEGORY_ORDER) {
+    const catMarkets = grouped.get(category)
+    if (!catMarkets || catMarkets.length < 3) continue
+
+    const sorted = [...catMarkets].sort(
+      (a, b) => parseFloat(b.volume24hr) - parseFloat(a.volume24hr)
+    )
+
+    const slugs = sorted.slice(0, 12).map(m => m.slug)
+    const spotlight = sorted[0]
+
+    sections.push({
+      id: toId(category),
+      label: category,
+      intro: `The most actively traded ${category.toLowerCase()} markets right now.`,
+      narrative: buildNarrative(spotlight),
+      slugs,
+      spotlightSlug: spotlight.slug,
+      spotlightDescription: spotlight.question,
+    })
   }
+
+  if (sections.length === 0) {
+    throw new Error('No sections could be built from the provided markets')
+  }
+
   return sections
 }
