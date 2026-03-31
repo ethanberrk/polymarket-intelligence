@@ -44,7 +44,7 @@ beforeEach(() => {
   ;(fetchAllMarkets as jest.Mock).mockResolvedValue([])
   ;(filterAndCapMarkets as jest.Mock).mockReturnValue([])
   ;(fetchHeadlines as jest.Mock).mockResolvedValue([])
-  ;(clusterMarkets as jest.Mock).mockResolvedValue(MOCK_SECTIONS)
+  ;(clusterMarkets as jest.Mock).mockReturnValue(MOCK_SECTIONS)
   ;(setSections as jest.Mock).mockResolvedValue(undefined)
 })
 
@@ -80,7 +80,7 @@ describe('GET /api/refresh-sections', () => {
   })
 
   it('returns 500 and does not call setSections when clusterMarkets throws', async () => {
-    ;(clusterMarkets as jest.Mock).mockRejectedValue(new Error('Claude down'))
+    ;(clusterMarkets as jest.Mock).mockImplementation(() => { throw new Error('Claude down') })
     const res = await GET(makeRequest('test-secret'))
     expect(res.status).toBe(500)
     expect(setSections).not.toHaveBeenCalled()

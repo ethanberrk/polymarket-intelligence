@@ -17,7 +17,7 @@ export async function GET(request: Request) {
     ])
 
     const filtered = filterAndCapMarkets(allMarkets)
-    const sections = await clusterMarkets(filtered, headlines)
+    const sections = clusterMarkets(filtered, headlines)
     await setSections(sections)
 
     return NextResponse.json({ ok: true, sections: sections.length })
