@@ -52,48 +52,53 @@ const VALID_SECTIONS: Omit<CuratedSection, 'markets'>[] = [
   },
 ]
 
+function makeToolUseResponse(sections: Omit<CuratedSection, 'markets'>[]) {
+  return {
+    content: [{ type: 'tool_use', id: 'tu_1', name: 'output_sections', input: { sections } }],
+  }
+}
+
 describe('clusterMarkets', () => {
-  it('returns parsed sections from valid Claude response', async () => {
-    mockCreate.mockResolvedValue({
-      content: [{ type: 'text', text: JSON.stringify(VALID_SECTIONS) }],
-    })
-    const markets = [makeMarket('market-a'), makeMarket('market-b'), makeMarket('market-c')]
-    const headlines = [makeHeadline('Big story')]
-    const result = await clusterMarkets(markets, headlines)
+  it('returns sections from tool use response', async () => {
+    mockCreate.mockResolvedValue(makeToolUseResponse(VALID_SECTIONS))
+    const result = await clusterMarkets(
+      [makeMarket('market-a'), makeMarket('market-b'), makeMarket('market-c')],
+      [makeHeadline('Big story')]
+    )
     expect(result).toEqual(VALID_SECTIONS)
   })
 
-  it('strips markdown code fences from Claude response', async () => {
-    const wrapped = '```json\n' + JSON.stringify(VALID_SECTIONS) + '\n```'
-    mockCreate.mockResolvedValue({
-      content: [{ type: 'text', text: wrapped }],
-    })
-    const result = await clusterMarkets([makeMarket('market-a'), makeMarket('market-b'), makeMarket('market-c')], [])
-    expect(result).toEqual(VALID_SECTIONS)
+  it('throws when tool use block is missing', async () => {
+    mockCreate.mockResolvedValue({ content: [{ type: 'text', text: 'oops' }] })
+    await expect(clusterMarkets([makeMarket('m1'), makeMarket('m2'), makeMarket('m3')], [])).rejects.toThrow(
+      'tool use block'
+    )
   })
 
-  it('throws when Claude returns empty array', async () => {
+  it('throws when sections array is empty', async () => {
     mockCreate.mockResolvedValue({
-      content: [{ type: 'text', text: '[]' }],
+      content: [{ type: 'tool_use', id: 'tu_1', name: 'output_sections', input: { sections: [] } }],
     })
     await expect(clusterMarkets([makeMarket('m1'), makeMarket('m2'), makeMarket('m3')], [])).rejects.toThrow(
       'empty'
     )
   })
 
-  it('throws when Claude returns invalid JSON', async () => {
-    mockCreate.mockResolvedValue({
-      content: [{ type: 'text', text: 'not json at all' }],
-    })
-    await expect(clusterMarkets([makeMarket('m1'), makeMarket('m2'), makeMarket('m3')], [])).rejects.toThrow()
-  })
-
-  it('calls Claude with haiku model', async () => {
-    mockCreate.mockResolvedValue({
-      content: [{ type: 'text', text: JSON.stringify(VALID_SECTIONS) }],
-    })
+  it('calls Claude with haiku model and tool_choice forced', async () => {
+    mockCreate.mockResolvedValue(makeToolUseResponse(VALID_SECTIONS))
     await clusterMarkets([makeMarket('m1'), makeMarket('m2'), makeMarket('m3')], [])
     const call = mockCreate.mock.calls[0][0]
     expect(call.model).toBe('claude-haiku-4-5-20251001')
+    expect(call.tool_choice).toEqual({ type: 'tool', name: 'output_sections' })
+  })
+
+  it('passes markets and headlines to Claude', async () => {
+    mockCreate.mockResolvedValue(makeToolUseResponse(VALID_SECTIONS))
+    const markets = [makeMarket('m1'), makeMarket('m2'), makeMarket('m3')]
+    const headlines = [makeHeadline('Story')]
+    await clusterMarkets(markets, headlines)
+    const call = mockCreate.mock.calls[0][0]
+    expect(call.messages[0].content).toContain('m1')
+    expect(call.messages[0].content).toContain('Story')
   })
 })

@@ -39,16 +39,31 @@ OUTPUT FORMAT (JSON array, each element matching this shape exactly):
 ]`
 }
 
-function parseClusterResponse(text: string): Omit<CuratedSection, 'markets'>[] {
-  const json = text
-    .replace(/^```(?:json)?\n?/, '')
-    .replace(/\n?```$/, '')
-    .trim()
-  const parsed = JSON.parse(json)
-  if (!Array.isArray(parsed) || parsed.length === 0) {
-    throw new Error('Claude returned empty or non-array response')
-  }
-  return parsed as Omit<CuratedSection, 'markets'>[]
+const OUTPUT_TOOL = {
+  name: 'output_sections',
+  description: 'Output the curated story sections as structured data',
+  input_schema: {
+    type: 'object' as const,
+    properties: {
+      sections: {
+        type: 'array',
+        items: {
+          type: 'object',
+          properties: {
+            id: { type: 'string' },
+            label: { type: 'string' },
+            intro: { type: 'string' },
+            narrative: { type: 'string' },
+            slugs: { type: 'array', items: { type: 'string' } },
+            spotlightSlug: { type: 'string' },
+            spotlightDescription: { type: 'string' },
+          },
+          required: ['id', 'label', 'intro', 'narrative', 'slugs', 'spotlightSlug', 'spotlightDescription'],
+        },
+      },
+    },
+    required: ['sections'],
+  },
 }
 
 export async function clusterMarkets(
@@ -76,9 +91,18 @@ export async function clusterMarkets(
   const response = await client.messages.create({
     model: 'claude-haiku-4-5-20251001',
     max_tokens: 4096,
+    tools: [OUTPUT_TOOL],
+    tool_choice: { type: 'tool', name: 'output_sections' },
     messages: [{ role: 'user', content: buildPrompt(marketsJson, headlinesJson) }],
   })
 
-  const text = response.content[0].type === 'text' ? response.content[0].text : ''
-  return parseClusterResponse(text)
+  const toolUse = response.content.find(c => c.type === 'tool_use')
+  if (!toolUse || toolUse.type !== 'tool_use') {
+    throw new Error('Claude did not return tool use block')
+  }
+  const { sections } = toolUse.input as { sections: Omit<CuratedSection, 'markets'>[] }
+  if (!Array.isArray(sections) || sections.length === 0) {
+    throw new Error('Claude returned empty sections')
+  }
+  return sections
 }
